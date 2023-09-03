@@ -1,9 +1,33 @@
 import { useEffect, useState } from "react";
+import useSWR from "swr";
 
 const LastSales = (props) => {
   const [sales, setSales] = useState();
-  const [isLoading, setIsLoading] = useState(false);
+  //   const [isLoading, setIsLoading] = useState(false);
 
+  const fetcher = (...args) => fetch(...args).then((res) => res.json());
+
+  const { data, error, isLoading } = useSWR(
+    "https://react-http-request-test-12f89-default-rtdb.asia-southeast1.firebasedatabase.app/sales.json",
+    fetcher
+  );
+
+  useEffect(() => {
+    if (data) {
+      const transformData = [];
+
+      for (const key in data) {
+        transformData.push({
+          id: key,
+          username: data[key].username,
+          volume: data[key].volume,
+        });
+      }
+      setSales(transformData);
+    }
+  }, [data]);
+
+  /*
   useEffect(() => {
     setIsLoading(true);
     fetch(
@@ -25,12 +49,18 @@ const LastSales = (props) => {
       });
   }, []);
 
-  if (!sales) {
-    return <p>No data found...</p>;
+  */
+
+  if (error) {
+    return <p>something went wrong...</p>;
   }
 
   if (isLoading) {
     return <p>Loading...</p>;
+  }
+
+  if (!sales || !data) {
+    return <p>No data found...</p>;
   }
 
   return (
