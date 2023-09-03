@@ -3,6 +3,7 @@ const UserProfile = (props) => {
 };
 export default UserProfile;
 
-export async function getServerSideProps() {
+export async function getServerSideProps(context) {
+  const { params, req, res } = context;
   return { props: { username: "Amanullah" } };
 }
