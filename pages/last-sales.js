@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import useSWR from "swr";
 
 const LastSales = (props) => {
-  const [sales, setSales] = useState();
+  const [sales, setSales] = useState(props.sales);
+  console.log("outside");
+  console.log(props.sales);
   //   const [isLoading, setIsLoading] = useState(false);
 
   const fetcher = (...args) => fetch(...args).then((res) => res.json());
@@ -23,6 +25,8 @@ const LastSales = (props) => {
           volume: data[key].volume,
         });
       }
+      console.log("inside");
+      console.log(transformData);
       setSales(transformData);
     }
   }, [data]);
@@ -59,7 +63,7 @@ const LastSales = (props) => {
     return <p>Loading...</p>;
   }
 
-  if (!sales || !data) {
+  if (!sales && !data) {
     return <p>No data found...</p>;
   }
 
@@ -74,3 +78,22 @@ const LastSales = (props) => {
   );
 };
 export default LastSales;
+
+export async function getStaticProps() {
+  const response = await fetch(
+    "https://react-http-request-test-12f89-default-rtdb.asia-southeast1.firebasedatabase.app/sales.json"
+  );
+  const data = await response.json();
+
+  const transformData = [];
+
+  for (const key in data) {
+    transformData.push({
+      id: key,
+      username: data[key].username,
+      volume: data[key].volume,
+    });
+  }
+
+  return { props: { sales: transformData } };
+}
